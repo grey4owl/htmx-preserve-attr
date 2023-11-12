@@ -17,11 +17,9 @@ Add `hx-ext="preserve-attr"` to body tag.
 For each attribute you want to preserve while swaping, add `hx:` as a prefix..
 For example `hx:foo="bar"`
 ```html
-<div hx:foo="bar" hx-get="/new-content" hx-swap="outerHTML" hx-trigger="load"></div>
+<div hx:foo="bar" hx-get="/new-element" hx-swap="outerHTML" hx-trigger="load">old element</div>
 ```
 And you should get the following output:
 ```html
-<div foo="bar">
-<!-- new content.. -->
-</div>
+<div foo="bar" class="something">new element</div>
 ```
