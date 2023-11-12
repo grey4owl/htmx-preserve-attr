@@ -8,13 +8,13 @@ htmx.defineExtension("preserve-attr", {
         let attr_name = response.name
         let attr_value = response.value
         let swap_type = target.getAttribute("hx-swap")
-        if (attr_name.startsWith("hx:") && swap_type === "outerHTML") {
-          attr_name = attr_name.replace("hx:", "")
-          htmx.on(evt.target, "htmx:load", (evt) => {
-            target = evt.detail.elt
+        htmx.on(evt.target, "htmx:load", (evt) => {
+          target = evt.detail.elt
+          if (attr_name.startsWith("hx:") && swap_type === "outerHTML") {
+            attr_name = attr_name.replace("hx:", "")
             target.setAttribute(attr_name, attr_value)
-          })
-        }
+          }
+        })
       })
     }
   }
