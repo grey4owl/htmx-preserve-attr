@@ -1,20 +1,34 @@
 //--  HTMX Preserve attributes extension
 //--  created by: maᴚko.  
+function format_object(obj) {
+  return `{${Object.entries(obj).map(([key, value]) => {
+    if (Array.isArray(value)) {
+      const formatted_array = value.map(item => {
+        if (Array.isArray(item)) {
+          return `[${item.join(', ')}]`
+        } else if (typeof item === 'object' && item !== null) {
+          return format_object(item)
+        } else {
+          return item;
+        }
+      }).join(', ')
+      return `'${key}': [${formatted_array}]`
+    } else if (typeof(value) === "object" && value !== null) {
+      return `${key}: ${format_object(value)}`
+    } else if (typeof(value) === "string") {
+      return `${key}: '${value}'`
+    } else if (typeof(value) === "function") {
+      return value
+    } else {
+      return `${key}: ${value}`
+    }
+  }).join(',')}}`
+}
 function morph_alpine_data(data, new_data) {
   data = eval("(" + data + ")")
   new_data = eval("(" + new_data + ")")
   let morph = Object.assign({}, data, new_data)
-  morph = Object.entries(morph).map(([name, value]) => {
-    if (typeof(value) === "function") {
-      value = value.toString().replace(/^.*?\{([\s\S]*?)\}.*$/, '$1').trim()
-      value = "{" + value + "}"
-      name = name + "()"
-    }
-    return [name, value]
-  })
-  morph = Object.fromEntries(morph)
-  morph = JSON.stringify(morph, null, 2)
-  morph = morph.replace(/"/g, "").replace(/\):\s\}*/g, ")")
+  morph = format_object(morph)
   // console.log(morph)
   return morph
 }
