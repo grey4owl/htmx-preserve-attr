@@ -4,7 +4,18 @@ function morph_alpine_data(data, new_data) {
   data = eval("(" + data + ")")
   new_data = eval("(" + new_data + ")")
   let morph = Object.assign({}, data, new_data)
-  morph = JSON.stringify(morph)
+  morph = Object.entries(morph).map(([name, value]) => {
+    if (typeof(value) === "function") {
+      value = value.toString().replace(/^.*?\{([\s\S]*?)\}.*$/, '$1').trim()
+      value = "{" + value + "}"
+      name = name + "()"
+    }
+    return [name, value]
+  })
+  morph = Object.fromEntries(morph)
+  morph = JSON.stringify(morph, null, 2)
+  morph = morph.replace(/"/g, "").replace(/\):\s\}*/g, ")")
+  // console.log(morph)
   return morph
 }
 htmx.defineExtension("preserve-attr", {
