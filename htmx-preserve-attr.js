@@ -1,11 +1,14 @@
 //--  HTMX Preserve attributes extension
 //--  created by: maᴚko.  
+function morph_alpine_data(data, new_data) {
+  data = eval("(" + data + ")")
+  new_data = eval("(" + new_data + ")")
+  let morph = Object.assign({}, data, new_data)
+  morph = JSON.stringify(morph)
+  return morph
+}
 htmx.defineExtension("preserve-attr", {
   onEvent : function(name, evt) {
-    /* if (name === "htmx:beforeOnLoad") {
-      let new_attributes = evt.detail.target["htmx-internal-data"]
-      console.log(new_attributes)
-    } */
     if (name === "htmx:afterOnLoad") {
       let target = evt.detail.target
       let swap_type = target.attributes["hx-swap"] ? target.attributes["hx-swap"].value : false
@@ -16,12 +19,15 @@ htmx.defineExtension("preserve-attr", {
           return attribute.name.startsWith("hx:")
         })
         let new_attributes = target["htmx-internal-data"].replacedWith["attributes"]
+        let get_data = new_attributes["x-data"] ? new_attributes["x-data"].value : false
         filter.map((response) => {
           let attr_name = response.name
           attr_name = attr_name.replace("hx:", "")
           let attr_value = response.value
           let new_attr = document.createAttribute(attr_name)
-          new_attr.value = attr_value
+          if (attr_name === "x-data") {
+            new_attr.value = morph_alpine_data(attr_value, get_data)
+          } else { new_attr.value = attr_value }
           new_attributes.setNamedItem(new_attr)
         })
       }
