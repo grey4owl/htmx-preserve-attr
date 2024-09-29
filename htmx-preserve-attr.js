@@ -34,28 +34,31 @@ function morph_alpine_data(data, new_data) {
 }
 htmx.defineExtension("preserve-attr", {
   onEvent : function(name, evt) {
-    if (name === "htmx:afterOnLoad") {
+    if (name === "htmx:beforeSwap") {
+      // console.log(`${evt.type}`, evt.timeStamp)
       let target = evt.detail.target
       let swap_type = target.attributes["hx-swap"] ? target.attributes["hx-swap"].value : false
-      let init_hash = target["htmx-internal-data"].initHash
-      if (swap_type === "outerHTML" && init_hash === null) {
+      // let init_hash = target["htmx-internal-data"].initHash
+      if (swap_type === "outerHTML" /*&& init_hash === null*/) {
         let get_attributes = Array.from(target.attributes)
-        let filter = get_attributes.filter((attribute) => {
+        filter = get_attributes.filter((attribute) => {
           return attribute.name.startsWith("hx:")
         })
-        let new_attributes = target["htmx-internal-data"].replacedWith["attributes"]
-        let get_data = new_attributes["x-data"] ? new_attributes["x-data"].value : false
-        filter.map((response) => {
-          let attr_name = response.name
-          attr_name = attr_name.replace("hx:", "")
-          let attr_value = response.value
-          let new_attr = document.createAttribute(attr_name)
-          if (attr_name === "x-data") {
-            new_attr.value = morph_alpine_data(attr_value, get_data)
-          } else { new_attr.value = attr_value }
-          new_attributes.setNamedItem(new_attr)
-        })
       }
+      let response = new DOMParser().parseFromString(evt.detail.serverResponse, "text/html");
+      let new_target = response.body.firstChild
+      filter.map((attr) => {
+        let new_attribute = document.createAttribute(attr.name.replace("hx:", ""))
+        let get_data = new_attribute.name === "x-data" ? new_attribute.value : false
+        if (attr.name === "x-data") {
+          new_attribute.value = morph_alpine_data(attr.value, get_data)
+        } else {
+          new_attribute.value = attr.value
+        }
+        new_target.setAttributeNode(new_attribute)
+      })
+      evt.detail.serverResponse = response.body.innerHTML
+      // console.log(evt)
     }
   }
 })

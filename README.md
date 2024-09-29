@@ -6,8 +6,8 @@ May be useful if you work with [alpine.js](https://alpinejs.dev/)..
 Include `htmx-preserve-attr.js` script in `head` tag after htmx initialization
 ```html
 <head>
-  <script src="https://unpkg.com/htmx.org@latest" defer></script>
-  <script src="htmx-preserve-attr.js" defer></script>
+  <script src="https://unpkg.com/htmx.org@latest"></script>
+  <script src="htmx-preserve-attr.js"></script>
 </head>
 ```
 Add `hx-ext="preserve-attr"` to body tag.
@@ -17,9 +17,14 @@ Add `hx-ext="preserve-attr"` to body tag.
 For each attribute you want to preserve while swaping, add `hx:` as a prefix..
 For example `hx:foo="bar"`
 ```html
-<div hx:foo="bar" hx-get="/new-element" hx-swap="outerHTML" hx-trigger="load">old element</div>
+<div 
+hx:foo="bar" 
+hx:x-data="{ message: 'Hello World!' }"
+hx-get="/new-element" 
+hx-swap="outerHTML" 
+hx-trigger="load">Old element</div>
 ```
 And you should get the following output:
 ```html
-<div foo="bar" class="something">new element</div>
+<div foo="bar" class="new-element" x-text="message">Hello World!</div>
 ```

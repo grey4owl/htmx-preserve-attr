@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTMX Preserve Attributes Extension (TEST)</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/htmx.org@2.0.2"></script>
+    <script src="htmx-preserve-attr.js"></script>
+  </head>
+  <body hx-ext="preserve-attr">
+    <div
+    hx:foo="bar" 
+    hx:x-data="{ message: 'Hello World!' }"
+    hx-get="/new-element" 
+    hx-swap="outerHTML"
+    hx-trigger="load">Old element</div>
+  </body>
+</html>
