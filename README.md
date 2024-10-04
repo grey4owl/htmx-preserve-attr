@@ -26,5 +26,5 @@ hx-trigger="load">Old element</div>
 ```
 And you should get the following output:
 ```html
-<div foo="bar" class="new-element" x-text="message">Hello World!</div>
+<div foo="bar" class="new-element" x-data="{ message: 'Hello World!' }" x-text="message">Hello World!</div>
 ```
