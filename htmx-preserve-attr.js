@@ -34,7 +34,7 @@ function morph_alpine_data(data, new_data) {
 }
 htmx.defineExtension("preserve-attr", {
   onEvent : function(name, evt) {
-    if (name === "htmx:beforeSwap") {
+    if (name === "htmx:beforeSwap" && evt.detail.serverResponse.length > 0) {
       // console.log(`${evt.type}`, evt.timeStamp)
       let target = evt.target
       let swap_type = target.attributes["hx-swap"] ? target.attributes["hx-swap"].value : false
