@@ -1,2 +1,8 @@
-<div class="first-element">First element</div>
-<div class="seccond-element" hx-load="beforebegin:.first-element">Seccond element</div>
+<head hx-head="append">
+  <script first hx-load="afterbegin:script[second]">let aaa</script>
+  <script second>let bbb</script>
+  <script third>let ccc</script>
+  <script forth>let ddd</script>
+</head>
+<div first>First</div>
+<div second hx-load="beforebegin:div[first]">Second</div>

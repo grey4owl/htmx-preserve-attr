@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html hx-ext="head-support, load-control">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTMX Load Control Extension (TEST)</title>
     <script src="https://unpkg.com/htmx.org@2.0.2"></script>
+    <script src="htmx-head-support.min.js"></script>
     <script src="htmx-load-control.js"></script>
   </head>
-  <body hx-ext="load-control">
+  <body>
     <div
       hx-get="/new-element" 
       hx-swap="outerHTML"
