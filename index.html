@@ -11,7 +11,9 @@
   <body hx-ext="preserve-attr">
     <div
     hx:foo="bar" 
-    hx:x-data="{ message: 'Hello World!' }"
+    hx:class="added-class"
+    hx:style="font-size: 1rem; color: red"
+    hx:x-data="{ message: 'Hello World!', ss: 'bb' }"
     hx-get="/new-element" 
     hx-swap="outerHTML"
     hx-trigger="load">Old element</div>

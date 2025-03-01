@@ -1,63 +1,76 @@
 //--  HTMX Preserve attributes extension
 //--  created by: maᴚko.  
 function format_object(obj) {
-  return `{${Object.entries(obj).map(([key, value]) => {
+      console.log(obj)
+  return `{${
+    Object.entries(obj).map(([key, value]) => {
     if (Array.isArray(value)) {
       const formatted_array = value.map(item => {
         if (Array.isArray(item)) {
-          return `[${item.join(', ')}]`
+          return `[${item.join(', ')}]`;
         } else if (typeof item === 'object' && item !== null) {
-          return format_object(item)
+          return format_object(item);
         } else {
           return item;
         }
-      }).join(', ')
-      return `'${key}': [${formatted_array}]`
+      }).join(', ');
+      return `'${key}': [${formatted_array}]`;
     } else if (typeof(value) === "object" && value !== null) {
-      return `${key}: ${format_object(value)}`
+      return `${key}: ${format_object(value)}`;
     } else if (typeof(value) === "string") {
-      return `${key}: '${value}'`
+      return `${key}: '${value}'`;
     } else if (typeof(value) === "function") {
-      return value
+      return value;
     } else {
-      return `${key}: ${value}`
+      return `${key}: ${value}`;
     }
-  }).join(',')}}`
+  }).join(', ')}}`;
 }
 function morph_alpine_data(data, new_data) {
-  data = eval("(" + data + ")")
-  new_data = eval("(" + new_data + ")")
-  let morph = Object.assign({}, data, new_data)
-  morph = format_object(morph)
-  // console.log(morph)
-  return morph
+  data = eval("(" + data + ")");
+  new_data = eval("(" + new_data + ")");
+  let morph = Object.assign({}, new_data, data);
+  morph = format_object(morph);
+  // console.log(morph);
+  return morph;
 }
 htmx.defineExtension("preserve-attr", {
   onEvent : function(name, evt) {
     if (name === "htmx:beforeSwap" && evt.detail.serverResponse.length > 0) {
-      // console.log(`${evt.type}`, evt.timeStamp)
-      let target = evt.target
-      let swap_type = target.attributes["hx-swap"] ? target.attributes["hx-swap"].value : false
-      const is_preservable = Object.values(target.attributes).some(attr => attr.name.startsWith("hx:"))
+      // console.log(`${evt.type}`, evt.timeStamp);
+      let target = evt.target;
+      let swap_type = target.attributes["hx-swap"] ? target.attributes["hx-swap"].value : false;
+      const is_preservable = Object.values(target.attributes).some(attr => attr.name.startsWith("hx:"));
       if (swap_type === "outerHTML" && is_preservable) {
-        let get_attributes = Array.from(target.attributes)
+        let get_attributes = Array.from(target.attributes);
         filter = get_attributes.filter((attribute) => {
-          return attribute.name.startsWith("hx:")
+          return attribute.name.startsWith("hx:");
         })
         let response = new DOMParser().parseFromString(evt.detail.serverResponse, "text/html");
-        let new_target = response.body.firstChild
+        let new_target = response.body.firstChild;
         filter.map((attr) => {
-          let new_attribute = document.createAttribute(attr.name.replace("hx:", ""))
-          let get_data = new_attribute.name === "x-data" ? new_attribute.value : false
-          if (attr.name === "x-data") {
-            new_attribute.value = morph_alpine_data(attr.value, get_data)
-          } else {
-            new_attribute.value = attr.value
+          let new_attribute = document.createAttribute(attr.name.replace("hx:", ""));
+          switch (attr.name) {
+            case "hx:x-data":
+              if (new_attribute.name === "x-data" && new_target.attributes[new_attribute.name]) {
+                new_attribute.value = morph_alpine_data(attr.value, new_target.attributes[new_attribute.name].value);
+              } else {
+                new_attribute.value = attr.value;
+              }
+              break;
+            case "hx:style":
+              new_attribute.value = attr.value + ";" + new_target.attributes.style.value;
+              break;
+            case "hx:class":
+              new_attribute.value = attr.value + " " + new_target.attributes.class.value;
+              break;
+            default:
+              new_attribute.value = attr.value;
           }
-          new_target.setAttributeNode(new_attribute)
+          new_target.setAttributeNode(new_attribute);
         })
-        evt.detail.serverResponse = response.body.innerHTML
-        // console.log(evt)
+        evt.detail.serverResponse = response.body.innerHTML;
+        // console.log(evt);
       }
     }
   }
