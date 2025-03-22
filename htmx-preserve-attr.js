@@ -1,7 +1,6 @@
 //--  HTMX Preserve attributes extension
 //--  created by: maᴚko.  
 function format_object(obj) {
-      console.log(obj)
   return `{${
     Object.entries(obj).map(([key, value]) => {
     if (Array.isArray(value)) {
