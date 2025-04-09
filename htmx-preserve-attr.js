@@ -40,7 +40,7 @@ htmx.defineExtension("preserve-attr", {
       let target = evt.target;
       let swap_type = target.attributes["hx-swap"] ? target.attributes["hx-swap"].value : false;
       const is_preservable = Object.values(target.attributes).some(attr => attr.name.startsWith("hx:"));
-      if (swap_type === "outerHTML" && is_preservable) {
+      if (/*swap_type === "outerHTML" &&*/ is_preservable) {
         let get_attributes = Array.from(target.attributes);
         filter = get_attributes.filter((attribute) => {
           return attribute.name.startsWith("hx:");
@@ -49,24 +49,40 @@ htmx.defineExtension("preserve-attr", {
         let new_target = response.body.firstChild;
         filter.map((attr) => {
           let new_attribute = document.createAttribute(attr.name.replace("hx:", ""));
+          let new_target_access = false;
           switch (attr.name) {
             case "hx:x-data":
               if (new_attribute.name === "x-data" && new_target.attributes[new_attribute.name]) {
                 new_attribute.value = morph_alpine_data(attr.value, new_target.attributes[new_attribute.name].value);
+                new_target_access = true;
               } else {
                 new_attribute.value = attr.value;
               }
               break;
             case "hx:style":
-              new_attribute.value = attr.value + ";" + new_target.attributes.style.value;
+              if (new_target.attributes.style) {
+                new_attribute.value = attr.value + ";" + new_target.attributes.style.value;
+                new_target_access = true;
+              } else {
+                new_attribute.value = attr.value + ";" + target.attributes.style.value;
+              }
               break;
             case "hx:class":
-              new_attribute.value = attr.value + " " + new_target.attributes.class.value;
+              if (new_target.attributes.class) {
+                new_attribute.value = attr.value + " " + new_target.attributes.class.value;
+                new_target_access = true;
+              } else {
+                new_attribute.value = attr.value + " " + target.attributes.class.value;
+              }
               break;
             default:
               new_attribute.value = attr.value;
           }
-          new_target.setAttributeNode(new_attribute);
+          if (new_target_access) {
+            new_target.setAttributeNode(new_attribute);
+          } else {
+            target.setAttributeNode(new_attribute);
+          }
         })
         evt.detail.serverResponse = response.body.innerHTML;
         // console.log(evt);
